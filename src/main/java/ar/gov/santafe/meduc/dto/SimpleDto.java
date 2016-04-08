@@ -108,12 +108,38 @@ public class SimpleDto {
             Field[] fields = aClass.getDeclaredFields();
             for (Field aField : fields) {
                 aField.setAccessible(true);
-                aField.set(newInstance, getString(aField.getName()));
+                aField.set(newInstance, get(aField.getName(),aField.getType()));
             }
         } catch (InstantiationException | IllegalAccessException ex) {
             ex.printStackTrace();
         }
         return newInstance;
+    }
+
+    public SimpleDto(Object any) {
+        Class aClass = any.getClass();
+
+        Field[] fields = aClass.getDeclaredFields();
+        for (Field aField : fields) {
+            try {
+                aField.setAccessible(true);
+                atributos.put(aField.getName(),aField.get(any));
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(SimpleDto.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private <T>T get(String key, Class<T> type) {
+        Object value = atributos.get(key);
+        if (type.equals(String.class)){
+            return (T) value.toString();
+        } else if (type.equals(Long.class)){
+            return (T) Long.valueOf(value.toString());
+        } else {
+           // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+           return null;
+        }
     }
 
 }
