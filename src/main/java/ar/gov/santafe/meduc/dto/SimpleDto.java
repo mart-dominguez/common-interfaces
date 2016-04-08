@@ -115,7 +115,7 @@ public class SimpleDto {
         }
         return newInstance;
     }
-
+// aca un comentario nuevo
     public SimpleDto(Object any) {
         Class aClass = any.getClass();
 
