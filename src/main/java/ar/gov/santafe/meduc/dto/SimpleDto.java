@@ -1,9 +1,12 @@
 package ar.gov.santafe.meduc.dto;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -96,6 +99,21 @@ public class SimpleDto {
             genericDtoList.add(new SimpleDto(aMap));
         }
         return genericDtoList;
+    }
+
+    public <T> T as(Class<T> aClass) {
+        T newInstance = null;
+        try { 
+            newInstance = aClass.newInstance();
+            Field[] fields = aClass.getDeclaredFields();
+            for (Field aField : fields) {
+                aField.setAccessible(true);
+                aField.set(newInstance, getString(aField.getName()));
+            }
+        } catch (InstantiationException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+        return newInstance;
     }
 
 }
