@@ -3,7 +3,10 @@ package ar.gov.santafe.meduc.dto;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class SimpleDto {
 
     private Map<String, Object> atributos = new HashMap<String, Object>();
+    private final SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyyhhmmss");
 
     public SimpleDto() {
 
@@ -30,16 +34,6 @@ public class SimpleDto {
         }
     }
 
-    public SimpleDto(String[] names, Object[] args) {
-        for (int i = 0; i < args.length; i++) {
-            if (names == null || names.length < i + 1) {
-                this.atributos.put(i + "", args[i]);
-            } else {
-                this.atributos.put(names[i], args[i]);
-            }
-        }
-    }
-
     public SimpleDto(Map<String, Object> args) {
         if (args.get("atributos") != null) {
             atributos = (Map) args.get("atributos");
@@ -48,17 +42,12 @@ public class SimpleDto {
         }
     }
 
-    public static List<SimpleDto> asGenericDtoList(String[] names, List<Object[]> objectArrayList) {
-        List<SimpleDto> genericDtoList = new ArrayList<SimpleDto>();
-        for (Object[] unObjectArray : objectArrayList) {
-            genericDtoList.add(new SimpleDto(names, unObjectArray));
-        }
-        return genericDtoList;
-
-    }
-
     public void add(String name, Object atributo) {
-        this.atributos.put(name, atributo);
+        if (atributo instanceof Date){
+            add(name, (Date)atributo);
+        } else {
+            this.atributos.put(name, atributo);
+        }
     }
 
     public Object get(String atributo) {
@@ -125,7 +114,7 @@ public class SimpleDto {
         for (Field aField : fields) {
             try {
                 aField.setAccessible(true);
-                atributos.put(aField.getName(), aField.get(any));
+                add(aField.getName(), aField.get(any));
             } catch (IllegalArgumentException | IllegalAccessException ex) {
                 Logger.getLogger(SimpleDto.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -141,6 +130,8 @@ public class SimpleDto {
             return (T) value.toString();
         } else if (type.equals(Long.class)) {
             return (T) Long.valueOf(value.toString());
+        } else if (type.equals(Date.class)) {
+            return (T) getDate(key);
         } else if (type.equals(SimpleDto.class)) {
             return ((SimpleDto) value).as((Class<T>) type);
         } else if (type instanceof ParameterizedType) {
@@ -174,5 +165,23 @@ public class SimpleDto {
 
     public boolean isEmpty() {
         return atributos == null || atributos.isEmpty();
+    }
+
+    public Date getDate(String key) {
+        Object val = atributos.get(key);
+        if (val == null) {
+            return null;
+        }
+        Date date = null;
+        try {
+            date = sdf.parse(val.toString());
+        } catch (ParseException ex) {
+            Logger.getLogger(SimpleDto.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return date;
+    }
+
+    public void add(String key, Date date) {
+        this.atributos.put(key, sdf.format(date));
     }
 }
