@@ -41,10 +41,14 @@ public class CustomDeserializer extends JsonDeserializer<SimpleDto> {
             return;
         } else {
             Iterator<String> iterator = aNode.getFieldNames();
+            SimpleDto childDto = rootField.equals("root")?genericDto:new SimpleDto();
             while (iterator.hasNext()) {
                 String field = iterator.next();
                 JsonNode element = aNode.get(field);
-                addGenericNode(field, element, genericDto);
+                addGenericNode(field, element, childDto);
+            }
+            if (!rootField.equals("root")&&!childDto.isEmpty()){
+                genericDto.add(rootField, childDto);
             }
 
         }
@@ -59,7 +63,7 @@ public class CustomDeserializer extends JsonDeserializer<SimpleDto> {
                 list.add(element.asText());
             } else {
                 SimpleDto pp = new SimpleDto();
-                addGenericNode(field, element, pp);
+                addGenericNode("root", element, pp);
                 list.add(pp);
 
             }

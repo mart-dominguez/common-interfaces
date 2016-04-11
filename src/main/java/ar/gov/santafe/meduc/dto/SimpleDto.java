@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 @JsonRootName("")
 @JsonSerialize(using = CustomSerializer.class)
@@ -135,10 +134,15 @@ public class SimpleDto {
 
     private <T> T get(String key, Type type) {
         Object value = atributos.get(key);
+        if (value == null) {
+            return null;
+        }
         if (type.equals(String.class)) {
             return (T) value.toString();
         } else if (type.equals(Long.class)) {
             return (T) Long.valueOf(value.toString());
+        } else if (type.equals(SimpleDto.class)) {
+            return ((SimpleDto) value).as((Class<T>) type);
         } else if (type instanceof ParameterizedType) {
             ParameterizedType actualType = (ParameterizedType) type;
             Type actualClass = actualType.getActualTypeArguments()[0];
@@ -160,10 +164,15 @@ public class SimpleDto {
             }
 
             return (T) newList;
+        } else if (value instanceof SimpleDto) {
+            return ((SimpleDto) value).as((Class<T>) type);
         } else {
             // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             return null;
         }
     }
 
+    public boolean isEmpty() {
+        return atributos == null || atributos.isEmpty();
+    }
 }
