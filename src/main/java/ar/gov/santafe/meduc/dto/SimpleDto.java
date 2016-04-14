@@ -10,8 +10,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -43,8 +45,8 @@ public class SimpleDto {
     }
 
     public SimpleDto add(String name, Object atributo) {
-        if (atributo instanceof Date){
-            add(name, (Date)atributo);
+        if (atributo instanceof Date) {
+            add(name, (Date) atributo);
         } else {
             this.atributos.put(name, atributo);
         }
@@ -56,7 +58,8 @@ public class SimpleDto {
     }
 
     public String getString(String atributo) {
-        return this.atributos.get(atributo).toString();
+        Object attr = this.atributos.get(atributo);
+        return attr == null ? null : attr.toString();
     }
 
     public Map<String, Object> getAtributos() {
@@ -186,4 +189,40 @@ public class SimpleDto {
         this.atributos.put(key, sdf.format(date));
         return this;
     }
+
+    @JsonIgnore
+    private String getEqualsAttribute() {
+        String equalsAttribute = getString("equalsAttribute");
+        if (equalsAttribute == null) {
+            equalsAttribute = "id";
+        }
+        return getString(equalsAttribute);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.getEqualsAttribute());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SimpleDto other = (SimpleDto) obj;
+        if (!Objects.equals(this.getEqualsAttribute(), other.getEqualsAttribute())) {
+            return false;
+        }
+        return true;
+    }
+
 }
