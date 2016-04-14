@@ -25,7 +25,7 @@ public interface GenericService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}")
-    public SimpleDto getById(@PathParam("id")String id);
+    public SimpleDto findById(@PathParam("id")String id);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -35,6 +35,7 @@ public interface GenericService {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public SimpleDto update(@PathParam("id") String id, SimpleDto simpleDto);
 
     @DELETE

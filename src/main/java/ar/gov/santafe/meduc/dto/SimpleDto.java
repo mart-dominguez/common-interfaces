@@ -42,12 +42,13 @@ public class SimpleDto {
         }
     }
 
-    public void add(String name, Object atributo) {
+    public SimpleDto add(String name, Object atributo) {
         if (atributo instanceof Date){
             add(name, (Date)atributo);
         } else {
             this.atributos.put(name, atributo);
         }
+        return this;
     }
 
     public Object get(String atributo) {
@@ -181,7 +182,8 @@ public class SimpleDto {
         return date;
     }
 
-    public void add(String key, Date date) {
+    public SimpleDto add(String key, Date date) {
         this.atributos.put(key, sdf.format(date));
+        return this;
     }
 }
