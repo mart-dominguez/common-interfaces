@@ -45,6 +45,9 @@ public class SimpleDto {
     }
 
     public SimpleDto add(String name, Object atributo) {
+        if (name == null || atributo == null) {
+            return this;
+        }
         if (atributo instanceof Date) {
             add(name, (Date) atributo);
         } else {
