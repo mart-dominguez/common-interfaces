@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
  *
  * @author enorrmann
  */
-public interface GenericService {
+public interface GenericCrudService {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
