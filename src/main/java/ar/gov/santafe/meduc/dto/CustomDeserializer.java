@@ -61,10 +61,11 @@ public class CustomDeserializer extends JsonDeserializer<SimpleDto> {
             JsonNode element = elements.next();
             if (element.isTextual()) {
                 list.add(element.asText());
+            } else if (element.isNumber()) {
+                list.add(element.asLong());
             } else {
-                SimpleDto pp = new SimpleDto();
-                addGenericNode("root", element, pp);
-                list.add(pp);
+                addGenericNode("root", element, genericDto);
+                list.add(genericDto);
 
             }
         }
